@@ -10,21 +10,28 @@ st.text('значение в выпадающем списке')
 sex = st.selectbox('Пол пассажира', ['Любой', 'муж.', 'жен.'])
 
 
-def count_prices():
-    ticket_prices_m = {'1': 0, '2': 0, '3': 0}
-    ticket_prices_f = {'1': 0, '2': 0, '3': 0}
-
+def fetch_data():
+    lines = []
     with open('data.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        for row in reader:
-            pclass = row[2]
-            fare = float(row[9])
-            sex = row[4]
-            if sex == 'male':
-                ticket_prices_m[pclass] += fare
-            else:
-                ticket_prices_f[pclass] += fare
+        for line in reader:
+            lines.append(line)
+    return lines
+
+
+def count_prices(data):
+    ticket_prices_m = {'1': 0, '2': 0, '3': 0}
+    ticket_prices_f = {'1': 0, '2': 0, '3': 0}
+
+    for strings in data:
+        pclass = strings[2]
+        fare = float(strings[9])
+        sex = strings[4]
+        if sex == 'male':
+            ticket_prices_m[pclass] += fare
+        elif sex == 'female':
+            ticket_prices_f[pclass] += fare
 
     return {
             'Класс обслуживания': list(ticket_prices_m.keys()),
@@ -34,7 +41,7 @@ def count_prices():
 
 
 def main():
-    data = count_prices()
+    data = count_prices(fetch_data())
     st.table(data)
 
     # for pclass, total_price in data.items():
